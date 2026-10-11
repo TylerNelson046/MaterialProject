@@ -95,7 +95,12 @@ Representative local composition-only test R² (re-train to refresh):
 | heat_capacity_cv | Niche | ~0.55 |
 | energy_above_hull | Ready | ~0.40 |
 
-Hull and gap are especially limited without structure features; pretrained MACE / ALIGNN-style models are the planned next quality jump.
+Hull and gap are especially limited as composition-only heads. Structure-aware
+E_form / hull ranking uses the **frozen-first MACE** stack (optional
+`pip install -e ".[mace]"`): strategy [`docs/mace_strategy.md`](mace_strategy.md),
+contracts [`docs/mace_plan.md`](mace_plan.md), runbook [`docs/mace_runbook.md`](mace_runbook.md).
+Promote gate vs LightGBM is **Spearman** on the structure-gated intersection;
+band gap / moduli prefer frozen ALIGNN (wiring deferred).
 
 ## Package layout (`src/ml/`)
 

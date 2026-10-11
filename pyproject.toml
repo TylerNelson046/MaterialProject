@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "materials-predictor"
 version = "0.1.0"
-description = "Materials data collection, training exports, and LightGBM property models"
+description = "Materials data collection, training exports, LightGBM models, and optional MACE"
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.11"
@@ -31,6 +31,15 @@ dependencies = [
 dev = [
     "pytest>=7.4",
     "ruff>=0.4",
+]
+# Structure / MACE stack (Phase 4+). Does not alter the default LightGBM install.
+# Install torch from pytorch.org first if you need a specific CUDA build, then:
+#   pip install -e ".[mace]"
+# Known-good notes: docs/mace_training.md
+mace = [
+    "torch>=2.2",
+    "ase>=3.22",
+    "mace-torch>=0.3.10",
 ]
 
 [tool.setuptools.packages.find]

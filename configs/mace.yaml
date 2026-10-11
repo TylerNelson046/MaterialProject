@@ -1,0 +1,249 @@
+# MACE config — Phase 4.0 contracts encoded.
+# Authority: docs/mace_plan.md (change pins there first).
+# Paths are relative to the project root unless absolute.
+
+contract_version: "4.0.0"
+# Phase 4.1: optional deps + smoke live under import path ml.mace (src/ml/mace/).
+
+export:
+  # Frozen composition/structure training package (labels + splits).
+  dir: data/processed/training_exports
+  targets_subdir: targets
+  # Structure-gated MACE pack (Phase 4.3; local by default).
+  mace_pack_dir: data/processed/mace_exports
+  mace_pack_version: "4.3.0"
+
+output:
+  models_dir: data/models
+  # Per-run layout: data/models/mace/<target>/<run_id>/
+  mace_subdir: mace
+
+foundation:
+  # Never call mace_mp() without an explicit model id (library default can change).
+  model_id: medium-mpa-0
+  family: MACE-MPA-0
+  dispersion: false
+  # Allowed ablation ids (see docs/mace_plan.md C2): medium, medium-mpa-0, ...
+  # float32: default for smoke/eval (stable on current torch wheels).
+  # float64: preferred for geometry optimization when the local stack supports it
+  # (some Python 3.14 + torch builds segfault on float64 MACE forward).
+  default_dtype: float32
+  # Used by ml.mace.checkpoints (requests download into cache_dir).
+  checkpoint_url: https://github.com/ACEsuit/mace-mp/releases/download/mace_mpa_0/mace-mpa-0-medium.model
+  cache_dir: data/models/mace/checkpoints
+  # Phase 4.9: retry flaky downloads (macOS SSL / transient GitHub errors).
+  checkpoint_download_retries: 3
+
+device:
+  # Preference order for train/eval; cpu required for smokes.
+  preference: [cuda, mps, cpu]
+
+energy:
+  # Export labels and reported metrics use eV/atom (formation_energy_per_atom).
+  label_unit: eV/atom
+  # ASE/MACE raw output is total cell energy in eV.
+  ase_energy_unit: eV
+  # Formation-energy reference vs export labels (DFT standard states).
+  # elemental_bulk_v1: frozen MACE μ on unary/ASE elemental structures (default).
+  # elemental_e0_v1: legacy isolated-atom checkpoint E0s (systematic ~eV bias — do not use for promote).
+  reference_protocol: elemental_bulk_v1
+  # Strategy: frozen-first — fine-tune is last resort after harness-verified promote fails.
+  frozen_first: true
+  allow_finetune_default: false
+  # Candidate scoring defaults (scripts/score_mace_structures.py).
+  score:
+    relax: true
+    relax_fmax: 0.05
+    relax_steps: 50
+
+# Ranking-first promote for score→relax→E_form→hull (MAE still reported).
+promote:
+  metric: spearman  # spearman | mae
+  note: "Primary use case is ranking candidates; Spearman > MAE for promote."
+
+splits:
+  column: split
+  train_value: train
+  val_value: val
+  test_value: test
+  # Resplit forbidden — use export fingerprint-grouped splits only.
+  allow_resplit: false
+
+structure:
+  path_column: structure_path
+  # Require resolvable on-disk structure (EX-STRUCT).
+  require_structure_path: true
+  # Training-only filter; document any eval filter in the run record.
+  max_atoms_train: null
+  max_atoms_eval: null
+  # Phase 4.2 audit output: data/processed/mace_exports/structure_audit/<target>/
+  audit_subdir: structure_audit
+  # Element gate uses MACE-MPA-0 coverage (Z=1–83, 89–94) — see ml.mace.elements.
+
+targets:
+  # Primary Phase 4.4–4.5 head.
+  primary: formation_energy_per_atom
+  formation_energy_per_atom:
+    tier: Ready
+    parquet: formation_energy_per_atom.parquet
+    label_col: label
+    label_unit: eV/atom
+    model_families: [mace_pretrained, mace_finetuned]
+
+  # Phase 4.7 — geometry density (optional short MACE relax).
+  density:
+    tier: Ready
+    parquet: density.parquet
+    label_col: label
+    label_unit: g/cm^3
+    # Reuse E_f structure audit when material_ids overlap (COD holdout audited on the fly).
+    reuse_audit_from: formation_energy_per_atom
+    protocol: geometry_v1
+    # Alternate: geometry_relax_v1 (requires [mace] calculator).
+    relax:
+      fmax: 0.5
+      steps: 25
+    model_families: [mace_pretrained]
+    evaluate_holdout_cod_geometry: true
+
+  # Phase 4.7 — named hull protocol (not a naive structure regressor).
+  energy_above_hull:
+    tier: Ready
+    parquet: energy_above_hull.parquet
+    label_col: label
+    label_unit: eV/atom
+    reuse_audit_from: formation_energy_per_atom
+    hull_protocol: mace_pd_eform_v1
+    # Reference pool = structure-gated train split of this pack (MACE E_form).
+    # Prefer resumable cache from scripts/cache_mace_eform.py when present.
+    reference_split: train
+    use_eform_cache: true
+    model_families: [mace_pretrained]
+
+  # Phase 4.8 — frozen MACE descriptors + LightGBM readout (promote if beats LGBM).
+  band_gap:
+    tier: Ready
+    parquet: band_gap.parquet
+    label_col: label
+    label_unit: eV
+    transform: log1p
+    reuse_audit_from: formation_energy_per_atom
+    embedding_protocol: mace_desc_meanstd_v1
+    model_families: [mace_embedding_head]
+
+  bulk_modulus_vrh:
+    tier: Niche
+    parquet: bulk_modulus_vrh.parquet
+    label_col: label
+    label_unit: GPa
+    transform: log1p
+    reuse_audit_from: formation_energy_per_atom
+    embedding_protocol: mace_desc_meanstd_v1
+    model_families: [mace_embedding_head]
+
+  shear_modulus_vrh:
+    tier: Niche
+    parquet: shear_modulus_vrh.parquet
+    label_col: label
+    label_unit: GPa
+    reuse_audit_from: formation_energy_per_atom
+    embedding_protocol: mace_desc_meanstd_v1
+    model_families: [mace_embedding_head]
+
+  thermal_conductivity_agl:
+    tier: Niche
+    parquet: thermal_conductivity_agl.parquet
+    label_col: label
+    transform: log1p
+    reuse_audit_from: formation_energy_per_atom
+    embedding_protocol: mace_desc_meanstd_v1
+    model_families: [mace_embedding_head]
+
+  debye_temperature:
+    tier: Niche
+    parquet: debye_temperature.parquet
+    label_col: label
+    transform: log1p
+    reuse_audit_from: formation_energy_per_atom
+    embedding_protocol: mace_desc_meanstd_v1
+    model_families: [mace_embedding_head]
+
+  heat_capacity_cv:
+    tier: Niche
+    parquet: heat_capacity_cv.parquet
+    label_col: label
+    transform: log1p
+    reuse_audit_from: formation_energy_per_atom
+    embedding_protocol: mace_desc_meanstd_v1
+    model_families: [mace_embedding_head]
+
+  battery_capacity_grav:
+    tier: Niche
+    parquet: battery_capacity_grav.parquet
+    label_col: label
+    reuse_audit_from: formation_energy_per_atom
+    embedding_protocol: mace_desc_meanstd_v1
+    model_families: [mace_embedding_head]
+
+embeddings:
+  # MACECalculator.get_descriptors defaults used by Phase 4.8.
+  protocol: mace_desc_meanstd_v1
+  invariants_only: true
+  num_layers: -1
+
+# Phase 4.9 — named scale presets (scripts/run_mace_pipeline.py).
+# CLI flags always win; these are the documented smoke vs full defaults.
+runs:
+  smoke:
+    description: "CPU-friendly frozen-first smoke (no fine-tune)."
+    device: cpu
+    audit_limit: 1000
+    eval_limit_per_split: 200
+    hull_limit_reference: 128
+    hull_limit_per_split: 64
+    density_limit_per_split: 200
+    density_cod_limit: 100
+    pack_targets:
+      - formation_energy_per_atom
+      - density
+      - energy_above_hull
+  full:
+    description: "Full frozen eval on CPU (or auto device); no fine-tune."
+    device: auto
+    audit_limit: null
+    eval_limit_per_split: null
+    hull_limit_reference: null
+    hull_limit_per_split: null
+    density_limit_per_split: null
+    density_cod_limit: null
+    pack_targets:
+      - formation_energy_per_atom
+      - density
+      - energy_above_hull
+
+progress_every: 200
+
+training:
+  seed: 42
+  # Energy-only until force/stress labels exist (docs/mace_plan.md C3).
+  energy_only: true
+  # Smoke / debug helpers (CLIs).
+  max_train_rows: null
+  # Phase 4.5 fine-tune (mace_run_train) defaults — override via CLI.
+  batch_size: 2
+  valid_batch_size: 2
+  lr: 0.0001
+  max_num_epochs: 20
+  patience: 8
+  energy_weight: 1.0
+  forces_weight: 0.0
+  ema: true
+  scaling: std_scaling
+  num_workers: 0
+  eval_limit_per_split: null
+
+registry:
+  # Shared with LightGBM under data/models/registry.json
+  model_family_pretrained: mace_pretrained
+  model_family_finetuned: mace_finetuned
+  model_family_embedding_head: mace_embedding_head

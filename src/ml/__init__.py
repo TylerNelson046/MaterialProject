@@ -18,6 +18,9 @@ predict
     Load runs and predict from formulas or feature matrices.
 registry
     ``registry.json`` + ``LEADERBOARD.md`` helpers.
+mace
+    Optional MACE helpers (``pip install -e ".[mace]"``): smoke, structure I/O,
+    audits — see ``docs/mace_training.md``.
 """
 
 from ml.composition_features import (
