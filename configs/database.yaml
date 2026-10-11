@@ -1,0 +1,134 @@
+# Internal unified database and source-ingestion settings.
+# Paths are relative to the project root unless absolute.
+
+duckdb:
+  path: data/processed/materials.duckdb
+  read_only: false
+
+materials_project:
+  enabled: true
+  raw_dir: data/raw/materials_project
+  # null / none = download all available summary documents.
+  max_materials: null
+  chunk_size: 1000
+  # Local mp-api Delta cache (override if needed).
+  # dataset_path: /Users/you/mp_datasets/build/collections/summary
+  # Full-catalog summary pull first. Structures are optional and large.
+  download_structures: false
+  structure_batch_size: 200
+  # Expanded Materials Project summary fields (no nested structure blob here;
+  # structures are fetched in a dedicated pass).
+  fields:
+    - material_id
+    - formula_pretty
+    - formula_anonymous
+    - composition
+    - composition_reduced
+    - chemsys
+    - elements
+    - nelements
+    - nsites
+    - volume
+    - density
+    - density_atomic
+    - symmetry
+    - formation_energy_per_atom
+    - energy_above_hull
+    - energy_per_atom
+    - uncorrected_energy_per_atom
+    - equilibrium_reaction_energy_per_atom
+    - is_stable
+    - decomposes_to
+    - band_gap
+    - is_gap_direct
+    - is_metal
+    - efermi
+    - cbm
+    - vbm
+    - is_magnetic
+    - ordering
+    - total_magnetization
+    - total_magnetization_normalized_vol
+    - total_magnetization_normalized_formula_units
+    - num_magnetic_sites
+    - num_unique_magnetic_sites
+    - types_of_magnetic_species
+    - bulk_modulus
+    - shear_modulus
+    - universal_anisotropy
+    - homogeneous_poisson
+    - e_total
+    - e_ionic
+    - e_electronic
+    - n
+    - weighted_surface_energy
+    - weighted_surface_energy_EV_PER_ANG2
+    - weighted_work_function
+    - theoretical
+    - deprecated
+    - has_props
+    - database_IDs
+    - possible_species
+
+jarvis:
+  enabled: true
+  raw_dir: data/raw/jarvis
+  dataset: dft_3d
+  # Set null for full catalog after the smoke test.
+  max_materials: null
+  download_structures: true
+
+oqmd:
+  enabled: true
+  raw_dir: data/raw/oqmd
+  base_url: https://oqmd.org/oqmdapi/formationenergy
+  page_size: 100
+  timeout_seconds: 180
+  max_retries: 12
+  # Energy above hull (eV/atom). 0 = on-hull / thermodynamically stable only.
+  # ~97k records vs ~1.4M unfiltered.
+  stability_max: 0.0
+  max_materials: null
+  # Summary ingest excludes sites; structure download sets this true per-call.
+  include_sites: false
+
+aflow:
+  enabled: true
+  raw_dir: data/raw/aflow
+  # AFLUX search API — ICSD catalog (~60k) is the experimental-structure focus.
+  base_url: https://aflow.org/API/aflux/
+  catalog: icsd
+  page_size: 500
+  timeout_seconds: 180
+  max_retries: 8
+  max_materials: null
+
+cod:
+  enabled: true
+  raw_dir: data/raw/cod
+  # Focused experimental slice: 1–4 elements, exclude carbon (inorganic-leaning).
+  # ~55k entries vs full COD (~500k+ mostly organics).
+  base_url: https://www.crystallography.net/cod/result
+  entry_url: https://www.crystallography.net/cod
+  strictmin: 1
+  strictmax: 4
+  exclude_elements:
+    - C
+  include_duplicates: false
+  include_theoretical: false
+  download_structures: true
+  timeout_seconds: 180
+  max_retries: 8
+  max_materials: null
+
+entity_resolution:
+  enabled: true
+  # reduced composition + space-group number + nsites;
+  # one representative per database per fingerprint;
+  # soft density / volume-per-atom gate before cross-source merge.
+  strategy: composition_and_structure_fingerprint
+  require_cross_source: true
+  density_rel_tol: 0.05
+  density_abs_tol: 0.15
+  vpa_rel_tol: 0.05
+  vpa_abs_tol: 0.5

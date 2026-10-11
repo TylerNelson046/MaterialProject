@@ -1,0 +1,236 @@
+"""Element-level nuclear reference data (public literature / NIST-style values).
+
+Thermal neutron absorption cross sections (σ_a) are for naturally abundant
+elements at ~0.0253 eV, in barns (10⁻²⁴ cm²). Melting points are elemental
+T_m in kelvin. These are screening aids, not isotope-resolved ENDF evaluations.
+
+Sources (compiled):
+- Thermal absorption: Sears / NIST Neutron Scattering Lengths (common tables)
+- Melting points: CRC Handbook / standard elemental data
+"""
+
+from __future__ import annotations
+
+# element -> thermal neutron absorption cross section (barns)
+THERMAL_ABSORPTION_BARNS: dict[str, float] = {
+    "H": 0.3326,
+    "He": 0.007,
+    "Li": 70.5,
+    "Be": 0.0076,
+    "B": 767.0,
+    "C": 0.0035,
+    "N": 1.90,
+    "O": 0.00019,
+    "F": 0.0096,
+    "Ne": 0.039,
+    "Na": 0.530,
+    "Mg": 0.063,
+    "Al": 0.231,
+    "Si": 0.171,
+    "P": 0.172,
+    "S": 0.53,
+    "Cl": 33.5,
+    "Ar": 0.675,
+    "K": 2.1,
+    "Ca": 0.43,
+    "Sc": 27.5,
+    "Ti": 6.09,
+    "V": 5.08,
+    "Cr": 3.05,
+    "Mn": 13.3,
+    "Fe": 2.56,
+    "Co": 37.18,
+    "Ni": 4.49,
+    "Cu": 3.78,
+    "Zn": 1.11,
+    "Ga": 2.75,
+    "Ge": 2.20,
+    "As": 4.5,
+    "Se": 11.7,
+    "Br": 6.9,
+    "Kr": 25.0,
+    "Rb": 0.38,
+    "Sr": 1.28,
+    "Y": 1.28,
+    "Zr": 0.185,
+    "Nb": 1.15,
+    "Mo": 2.48,
+    "Tc": 20.0,
+    "Ru": 2.56,
+    "Rh": 144.8,
+    "Pd": 6.9,
+    "Ag": 63.3,
+    "Cd": 2520.0,
+    "In": 193.8,
+    "Sn": 0.626,
+    "Sb": 4.91,
+    "Te": 4.7,
+    "I": 6.15,
+    "Xe": 23.9,
+    "Cs": 29.0,
+    "Ba": 1.1,
+    "La": 8.97,
+    "Ce": 0.63,
+    "Pr": 11.5,
+    "Nd": 50.5,
+    "Pm": 168.4,
+    "Sm": 5922.0,
+    "Eu": 4530.0,
+    "Gd": 49700.0,
+    "Tb": 23.4,
+    "Dy": 994.0,
+    "Ho": 64.7,
+    "Er": 159.0,
+    "Tm": 100.0,
+    "Yb": 34.8,
+    "Lu": 84.0,
+    "Hf": 104.1,
+    "Ta": 20.6,
+    "W": 18.3,
+    "Re": 89.7,
+    "Os": 16.0,
+    "Ir": 425.0,
+    "Pt": 10.3,
+    "Au": 98.65,
+    "Hg": 372.3,
+    "Tl": 3.43,
+    "Pb": 0.171,
+    "Bi": 0.0338,
+    "Th": 7.37,
+    "Pa": 200.6,
+    "U": 7.57,
+    "Np": 180.0,
+    "Pu": 1017.3,
+    "Am": 75.3,
+    "Cm": 9.5,
+    "Bk": 710.0,
+    "Cf": 2900.0,
+    "Ac": 890.0,  # poorly known; elevated screening value
+    "Ra": 12.8,
+    "Po": 0.5,
+}
+
+# element -> melting point (K)
+MELTING_POINT_K: dict[str, float] = {
+    "H": 14.01,
+    "He": 0.95,
+    "Li": 453.65,
+    "Be": 1560.0,
+    "B": 2349.0,
+    "C": 3800.0,  # graphite sublimes; approximate
+    "N": 63.15,
+    "O": 54.36,
+    "F": 53.53,
+    "Ne": 24.56,
+    "Na": 370.87,
+    "Mg": 923.0,
+    "Al": 933.47,
+    "Si": 1687.0,
+    "P": 317.3,
+    "S": 388.36,
+    "Cl": 171.6,
+    "Ar": 83.81,
+    "K": 336.53,
+    "Ca": 1115.0,
+    "Sc": 1814.0,
+    "Ti": 1941.0,
+    "V": 2183.0,
+    "Cr": 2180.0,
+    "Mn": 1519.0,
+    "Fe": 1811.0,
+    "Co": 1768.0,
+    "Ni": 1728.0,
+    "Cu": 1357.77,
+    "Zn": 692.68,
+    "Ga": 302.91,
+    "Ge": 1211.4,
+    "As": 1090.0,
+    "Se": 494.0,
+    "Br": 265.8,
+    "Kr": 115.79,
+    "Rb": 312.46,
+    "Sr": 1050.0,
+    "Y": 1799.0,
+    "Zr": 2128.0,
+    "Nb": 2750.0,
+    "Mo": 2896.0,
+    "Tc": 2430.0,
+    "Ru": 2607.0,
+    "Rh": 2237.0,
+    "Pd": 1828.05,
+    "Ag": 1234.93,
+    "Cd": 594.22,
+    "In": 429.75,
+    "Sn": 505.08,
+    "Sb": 903.78,
+    "Te": 722.66,
+    "I": 386.85,
+    "Xe": 161.4,
+    "Cs": 301.59,
+    "Ba": 1000.0,
+    "La": 1193.0,
+    "Ce": 1068.0,
+    "Pr": 1208.0,
+    "Nd": 1297.0,
+    "Pm": 1315.0,
+    "Sm": 1345.0,
+    "Eu": 1099.0,
+    "Gd": 1585.0,
+    "Tb": 1629.0,
+    "Dy": 1680.0,
+    "Ho": 1734.0,
+    "Er": 1802.0,
+    "Tm": 1818.0,
+    "Yb": 1097.0,
+    "Lu": 1925.0,
+    "Hf": 2506.0,
+    "Ta": 3290.0,
+    "W": 3695.0,
+    "Re": 3459.0,
+    "Os": 3306.0,
+    "Ir": 2719.0,
+    "Pt": 2041.4,
+    "Au": 1337.33,
+    "Hg": 234.32,
+    "Tl": 577.0,
+    "Pb": 600.61,
+    "Bi": 544.7,
+    "Th": 2023.0,
+    "Pa": 1841.0,
+    "U": 1405.3,
+    "Np": 917.0,
+    "Pu": 912.5,
+    "Am": 1449.0,
+    "Cm": 1618.0,
+    "Bk": 1259.0,
+    "Cf": 1173.0,
+    "Ac": 1323.0,
+    "Ra": 973.0,
+    "Po": 527.0,
+}
+
+
+def atom_fraction_weighted(
+    composition: dict[str, float],
+    table: dict[str, float],
+) -> float | None:
+    """Return atom-fraction weighted average; None if any element missing."""
+    if not composition:
+        return None
+    total = 0.0
+    weighted = 0.0
+    for el, amt in composition.items():
+        key = str(el).strip()
+        if key not in table:
+            return None
+        try:
+            amount = float(amt)
+        except (TypeError, ValueError):
+            return None
+        if amount <= 0:
+            continue
+        total += amount
+        weighted += amount * table[key]
+    if total <= 0:
+        return None
+    return weighted / total

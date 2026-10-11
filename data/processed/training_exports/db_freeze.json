@@ -1,0 +1,7 @@
+{
+  "snapshot_path": "data/processed/materials.duckdb.pretrain-export-20261011",
+  "source_path": "data/processed/materials.duckdb",
+  "sha256": "039313a7153e598e037ee7fc938ff2f5c82d4c719af1155a62ca8ab00b88682d",
+  "size_bytes": 2268868608,
+  "frozen_at_utc": "2026-10-11T16:05:52Z"
+}

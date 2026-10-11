@@ -1,0 +1,339 @@
+{
+  "export_version": "4.1.0",
+  "generated_at_utc": "2026-10-11T16:07:41Z",
+  "exclusion_rules": {
+    "exclusion_rules_version": "0.3.1",
+    "exclude_deprecated": true,
+    "quarantine_out_of_range": true,
+    "never_average_sources": true,
+    "exclude_label_conflicts_v1": true,
+    "conflict_exclude_targets": [
+      "band_gap",
+      "density",
+      "energy_above_hull",
+      "formation_energy_per_atom"
+    ],
+    "hull_comparable_sources": [
+      "jarvis",
+      "materials_project",
+      "oqmd"
+    ],
+    "source_priority": {
+      "materials_project": 0,
+      "jarvis": 1,
+      "oqmd": 2,
+      "aflow": 3,
+      "cod": 4,
+      "alexandria": 5,
+      "derived": 6
+    },
+    "thermal_agl_method": "aflow-agl",
+    "thermal_proxy_method": "element-table-kappa",
+    "physical_range_gates": {
+      "density": {
+        "lo": 0.01,
+        "hi": 30.0
+      },
+      "formation_energy_per_atom": {
+        "lo": -10.0,
+        "hi": 5.0
+      },
+      "energy_above_hull": {
+        "lo": -0.0001,
+        "hi": 5.0
+      },
+      "band_gap": {
+        "lo": 0.0,
+        "hi": 20.0
+      },
+      "mbj_bandgap": {
+        "lo": 0.0,
+        "hi": 20.0
+      },
+      "bulk_modulus_vrh": {
+        "lo": 0.0,
+        "hi": 1000.0
+      },
+      "shear_modulus_vrh": {
+        "lo": 0.0,
+        "hi": 1000.0
+      },
+      "youngs_modulus_vrh": {
+        "lo": 0.0,
+        "hi": 1000.0
+      },
+      "homogeneous_poisson": {
+        "lo": -1.0,
+        "hi": 0.5
+      },
+      "volume": {
+        "lo": 0.001,
+        "hi": 100000.0
+      },
+      "thermal_conductivity": {
+        "lo": 0.001,
+        "hi": 5000.0
+      },
+      "thermal_conductivity_proxy": {
+        "lo": 0.001,
+        "hi": 5000.0
+      },
+      "debye_temperature": {
+        "lo": 1.0,
+        "hi": 5000.0
+      },
+      "heat_capacity_cv": {
+        "lo": 0.0,
+        "hi": 1000000.0
+      }
+    }
+  },
+  "composition_features": {
+    "n_frac_cols": 118,
+    "frac_cols_sample": [
+      "frac_H",
+      "frac_He",
+      "frac_Li",
+      "frac_Be",
+      "frac_B",
+      "\u2026",
+      "frac_Lv",
+      "frac_Ts",
+      "frac_Og"
+    ],
+    "stat_cols": [
+      "comp_mean_atomic_number",
+      "comp_mean_atomic_mass",
+      "comp_max_atomic_number",
+      "comp_n_elements"
+    ]
+  },
+  "db_freeze": {
+    "snapshot_path": "data/processed/materials.duckdb.pretrain-export-20261011",
+    "source_path": "data/processed/materials.duckdb",
+    "sha256": "039313a7153e598e037ee7fc938ff2f5c82d4c719af1155a62ca8ab00b88682d",
+    "size_bytes": 2268868608,
+    "frozen_at_utc": "2026-10-11T16:05:52Z"
+  },
+  "split": {
+    "seed": 42,
+    "train_frac": 0.8,
+    "val_frac": 0.1,
+    "counts": {
+      "train": 366882,
+      "test": 48994,
+      "val": 44803
+    }
+  },
+  "targets": [
+    {
+      "name": "energy_above_hull",
+      "tier": "Ready",
+      "label_col": "energy_above_hull",
+      "gate": "train_ok_thermo",
+      "n_rows": 253247,
+      "n_before_conflict_filter": 293418,
+      "n_excluded_conflict": 40171,
+      "exclude_conflicts": true,
+      "split_counts": {
+        "train": 202143,
+        "test": 26366,
+        "val": 24738
+      },
+      "path": "data/processed/training_exports/targets/energy_above_hull.parquet",
+      "conflict_col": "conflict_energy_above_hull",
+      "n_composition_features": 122,
+      "n_label_conflict_true": 19862
+    },
+    {
+      "name": "formation_energy_per_atom",
+      "tier": "Ready",
+      "label_col": "formation_energy_per_atom",
+      "gate": "train_ok_thermo",
+      "n_rows": 260162,
+      "n_before_conflict_filter": 293418,
+      "n_excluded_conflict": 33256,
+      "exclude_conflicts": true,
+      "split_counts": {
+        "train": 207637,
+        "test": 27106,
+        "val": 25419
+      },
+      "path": "data/processed/training_exports/targets/formation_energy_per_atom.parquet",
+      "conflict_col": "conflict_formation_energy",
+      "n_composition_features": 122,
+      "n_label_conflict_true": 26777
+    },
+    {
+      "name": "band_gap",
+      "tier": "Ready",
+      "label_col": "band_gap",
+      "gate": "train_ok_gap",
+      "n_rows": 315866,
+      "n_before_conflict_filter": 328963,
+      "n_excluded_conflict": 13097,
+      "exclude_conflicts": true,
+      "split_counts": {
+        "train": 251744,
+        "test": 33388,
+        "val": 30734
+      },
+      "path": "data/processed/training_exports/targets/band_gap.parquet",
+      "conflict_col": "conflict_band_gap",
+      "n_composition_features": 122,
+      "n_label_conflict_true": 47276
+    },
+    {
+      "name": "density",
+      "tier": "Ready",
+      "label_col": "density",
+      "gate": null,
+      "n_rows": 425900,
+      "n_before_conflict_filter": 451681,
+      "n_excluded_conflict": 25781,
+      "exclude_conflicts": true,
+      "split_counts": {
+        "train": 339235,
+        "test": 45226,
+        "val": 41439
+      },
+      "path": "data/processed/training_exports/targets/density.parquet",
+      "conflict_col": "conflict_density",
+      "n_composition_features": 122,
+      "n_label_conflict_true": 34642
+    },
+    {
+      "name": "bulk_modulus_vrh",
+      "tier": "Niche",
+      "label_col": "bulk_modulus_vrh",
+      "gate": "train_ok_elastic",
+      "n_rows": 40690,
+      "n_before_conflict_filter": 40690,
+      "n_excluded_conflict": 0,
+      "exclude_conflicts": false,
+      "split_counts": {
+        "train": 32180,
+        "test": 4527,
+        "val": 3983
+      },
+      "path": "data/processed/training_exports/targets/bulk_modulus_vrh.parquet",
+      "conflict_col": null,
+      "n_composition_features": 122,
+      "n_label_conflict_true": 20112
+    },
+    {
+      "name": "shear_modulus_vrh",
+      "tier": "Niche",
+      "label_col": "shear_modulus_vrh",
+      "gate": "train_ok_elastic",
+      "n_rows": 40690,
+      "n_before_conflict_filter": 40690,
+      "n_excluded_conflict": 0,
+      "exclude_conflicts": false,
+      "split_counts": {
+        "train": 32180,
+        "test": 4527,
+        "val": 3983
+      },
+      "path": "data/processed/training_exports/targets/shear_modulus_vrh.parquet",
+      "conflict_col": null,
+      "n_composition_features": 122,
+      "n_label_conflict_true": 20112
+    },
+    {
+      "name": "thermal_conductivity_agl",
+      "tier": "Niche",
+      "label_col": "thermal_conductivity",
+      "gate": "train_ok_thermal_agl",
+      "n_rows": 5571,
+      "n_before_conflict_filter": 5571,
+      "n_excluded_conflict": 0,
+      "exclude_conflicts": false,
+      "split_counts": {
+        "train": 4400,
+        "test": 634,
+        "val": 537
+      },
+      "path": "data/processed/training_exports/targets/thermal_conductivity_agl.parquet",
+      "conflict_col": null,
+      "n_composition_features": 122,
+      "n_label_conflict_true": 3319
+    },
+    {
+      "name": "debye_temperature",
+      "tier": "Niche",
+      "label_col": "debye_temperature",
+      "gate": "train_ok_thermal_agl",
+      "n_rows": 5571,
+      "n_before_conflict_filter": 5571,
+      "n_excluded_conflict": 0,
+      "exclude_conflicts": false,
+      "split_counts": {
+        "train": 4400,
+        "test": 634,
+        "val": 537
+      },
+      "path": "data/processed/training_exports/targets/debye_temperature.parquet",
+      "conflict_col": null,
+      "n_composition_features": 122,
+      "n_label_conflict_true": 3319
+    },
+    {
+      "name": "heat_capacity_cv",
+      "tier": "Niche",
+      "label_col": "heat_capacity_cv",
+      "gate": "train_ok_thermal_agl",
+      "n_rows": 5571,
+      "n_before_conflict_filter": 5571,
+      "n_excluded_conflict": 0,
+      "exclude_conflicts": false,
+      "split_counts": {
+        "train": 4400,
+        "test": 634,
+        "val": 537
+      },
+      "path": "data/processed/training_exports/targets/heat_capacity_cv.parquet",
+      "conflict_col": null,
+      "n_composition_features": 122,
+      "n_label_conflict_true": 3319
+    },
+    {
+      "name": "battery_capacity_grav",
+      "tier": "Niche",
+      "label_col": "capacity_grav",
+      "gate": "train_ok_battery",
+      "n_rows": 17331,
+      "n_before_conflict_filter": 17331,
+      "n_excluded_conflict": 0,
+      "exclude_conflicts": false,
+      "split_counts": {
+        "train": 13884,
+        "test": 1781,
+        "val": 1666
+      },
+      "path": "data/processed/training_exports/targets/battery_capacity_grav.parquet",
+      "conflict_col": null,
+      "n_composition_features": 122,
+      "n_label_conflict_true": 2842
+    }
+  ],
+  "holdouts": {
+    "description": {
+      "holdout_cod_geometry": "COD-primary materials with structure_path. Use for experimental geometry / density evaluation; not a DFT label hold-out.",
+      "holdout_agl_thermal": "AFLOW AGL thermal rows (train_ok_thermal_agl). Prefer as the only honest thermal \u03ba / Debye / C_v evaluation set.",
+      "holdout_battery_electrode": "MP insertion-electrode hosts (train_ok_battery).",
+      "holdout_elastic_mechanical": "DFT/AEL elastic subset (train_ok_elastic) for B/G evaluation."
+    },
+    "counts": {
+      "holdout_cod_geometry": 45672,
+      "holdout_agl_thermal": 5571,
+      "holdout_battery_electrode": 17331,
+      "holdout_elastic_mechanical": 40690
+    }
+  },
+  "paths": {
+    "export_dir": "data/processed/training_exports",
+    "dataset_card": "data/processed/training_exports/DATASET_CARD.md",
+    "splits": "data/processed/training_exports/splits.parquet"
+  }
+}

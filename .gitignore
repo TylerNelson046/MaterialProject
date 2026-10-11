@@ -1,0 +1,59 @@
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+.eggs/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data artifacts (keep directory structure via .gitkeep)
+data/raw/**
+!data/raw/**/
+!data/raw/**/.gitkeep
+data/processed/**
+!data/processed/**/
+!data/processed/**/.gitkeep
+# Publish the training export package
+!data/processed/training_exports/
+!data/processed/training_exports/**
+data/structures/**
+!data/structures/**/
+!data/structures/**/.gitkeep
+data/features/**
+!data/features/**/
+!data/features/**/.gitkeep
+data/models/**
+!data/models/**/
+!data/models/**/.gitkeep
+*.duckdb
+*.duckdb.wal
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~
+
+# Local run logs
+logs/
+*.log
