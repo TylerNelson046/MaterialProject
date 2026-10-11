@@ -169,7 +169,7 @@ full-catalog dielectrics / surfaces / T_c, 100% elastic or thermal DFT coverage.
 1. Pick a head from Ready or Niche only.
 2. Apply hard rules (deprecated, physical ranges, method filters).
 3. Prefer `properties.method` / future SI method columns over unlabeled SI floats for mixed fields.
-4. Export features + label + `material_id` + source/method + structure path + train flags (Phase 4).
+4. Export features + label + `material_id` + source/method + structure path + train flags.
 
 Policy changes require an update to this file **and** a progress-log note in
 `DATASET_PERFECTION_PLAN.md`.

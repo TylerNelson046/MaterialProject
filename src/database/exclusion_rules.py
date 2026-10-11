@@ -3,7 +3,7 @@
 Authoritative prose: ``docs/exclusion_rules.md``.
 Label tiers: ``docs/label_policy.md``.
 
-These helpers encode Step 0.3 so Phase 1 train flags and Phase 4 exports share
+These helpers encode exclusion policy so train flags and training exports share
 one filter contract (no averaging, deprecated drop, hull comparability,
 physical-range quarantine).
 """

@@ -34,7 +34,7 @@
 - Stats: `comp_mean_atomic_number`, `comp_mean_atomic_mass`, `comp_max_atomic_number`, `comp_n_elements`.
 - Derived from `formula_pretty` via pymatgen Composition (no matminer).
 
-## Split recipe (Step 4.2)
+## Split recipe
 
 - Seed: `42`
 - Fractions: train 80% / val 10% / test 10%
@@ -49,7 +49,7 @@
 | train | 366,882 |
 | val | 44,803 |
 
-## Per-target exports (Step 4.1)
+## Per-target exports
 
 | Target | Tier | Rows | Excl. conflict | Train | Val | Test |
 |--------|------|-----:|---------------:|------:|----:|-----:|
@@ -64,7 +64,7 @@
 | `heat_capacity_cv` | Niche | 5,571 | 0 | 4,400 | 537 | 634 |
 | `battery_capacity_grav` | Niche | 17,331 | 0 | 13,884 | 1,666 | 1,781 |
 
-## Specialty hold-outs (Step 4.3)
+## Specialty hold-outs
 
 | Hold-out | N |
 |----------|--:|
@@ -94,4 +94,6 @@ training_exports/
 3. Do not train on Proxy columns or `thermal_conductivity_proxy` as DFT κ.
 4. Pin experiments to the freeze SHA-256 above.
 5. Use `frac_*` + composition-stat columns as tabular features when needed.
+   LightGBM training also adds elemental descriptors from `formula_pretty`
+   (see `docs/model_training.md`).
 

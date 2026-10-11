@@ -1,4 +1,4 @@
-# Specialty hold-outs (Step 4.3)
+# Specialty hold-outs
 
 These sets are **evaluation slices**. Default stratified splits still include these materials in train/val/test; for honest niche reporting, evaluate metrics on the hold-out material_ids (or restrict test metrics to `holdout_* == true`).
 

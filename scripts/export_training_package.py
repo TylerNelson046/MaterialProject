@@ -1,7 +1,7 @@
-"""Export Phase 4 training package: targets, splits, hold-outs, dataset card.
+"""Export training package: targets, splits, hold-outs, dataset card.
 
-Writes under ``data/processed/training_exports/``. Uses live DuckDB (post
-Phase 0–3 hygiene). Also records path to a fresh pretrain freeze copy.
+Writes under ``data/processed/training_exports/``. Uses live DuckDB after
+catalog hygiene. Also records path to a fresh pretrain freeze copy.
 """
 
 from __future__ import annotations
@@ -11,7 +11,7 @@ import json
 import shutil
 import sys
 from collections import defaultdict
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -166,7 +166,7 @@ def _sha256(path: Path) -> str:
 
 def _freeze_db(settings, out_dir: Path) -> dict[str, Any]:
     """Copy live DB to a dated freeze for export reproducibility."""
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%d")
+    stamp = datetime.now(UTC).strftime("%Y%m%d")
     dest = settings.processed_dir / f"materials.duckdb.pretrain-export-{stamp}"
     if not dest.exists():
         print(f"Freezing live DB → {dest} ...")
@@ -176,7 +176,7 @@ def _freeze_db(settings, out_dir: Path) -> dict[str, Any]:
         "source_path": str(settings.duckdb_path.relative_to(settings.project_root)),
         "sha256": _sha256(dest),
         "size_bytes": dest.stat().st_size,
-        "frozen_at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "frozen_at_utc": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
     }
     (out_dir / "db_freeze.json").write_text(json.dumps(meta, indent=2) + "\n")
     return meta
@@ -245,7 +245,7 @@ def _build_entity_groups(conn) -> dict[str, str]:
             fp_to_mats[fp].add(str(mid))
 
     mid_to_group: dict[str, str] = {}
-    for fp, mats in fp_to_mats.items():
+    for _fp, mats in fp_to_mats.items():
         # Canonical group id = sorted join of member material_ids (stable).
         group_id = "grp:" + hashlib.sha1(
             ("|".join(sorted(mats))).encode()
@@ -294,7 +294,7 @@ def assign_splits(
         by_strat[strat].append(gid)
 
     group_split: dict[str, str] = {}
-    for strat, gids in by_strat.items():
+    for _strat, gids in by_strat.items():
         gids = list(gids)
         rng.shuffle(gids)
         n = len(gids)
@@ -319,16 +319,13 @@ def _holdout_masks(si: pd.DataFrame) -> dict[str, pd.Series]:
         & si["structure_path"].notna(),
         "holdout_agl_thermal": si.get(
             "train_ok_thermal_agl", pd.Series(False, index=si.index)
-        ).fillna(False)
-        == True,  # noqa: E712
+        ).fillna(False),  # noqa: E712
         "holdout_battery_electrode": si.get(
             "train_ok_battery", pd.Series(False, index=si.index)
-        ).fillna(False)
-        == True,  # noqa: E712
+        ).fillna(False),  # noqa: E712
         "holdout_elastic_mechanical": si.get(
             "train_ok_elastic", pd.Series(False, index=si.index)
-        ).fillna(False)
-        == True,  # noqa: E712
+        ).fillna(False),  # noqa: E712
     }
 
 
@@ -470,7 +467,7 @@ def write_holdout_docs(holdouts: pd.DataFrame, out_dir: Path) -> dict[str, Any]:
     (hdir / "README.md").write_text(
         "\n".join(
             [
-                "# Specialty hold-outs (Step 4.3)",
+                "# Specialty hold-outs",
                 "",
                 "These sets are **evaluation slices**. Default stratified splits still "
                 "include these materials in train/val/test; for honest niche reporting, "
@@ -501,7 +498,7 @@ def write_dataset_card(
         "# Materials Predictor — Training Dataset Card",
         "",
         f"**Export version:** {EXPORT_VERSION}  ",
-        f"**Generated (UTC):** {datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')}  ",
+        f"**Generated (UTC):** {datetime.now(UTC).strftime('%Y-%m-%dT%H:%M:%SZ')}  ",
         f"**Exclusion rules:** {EXCLUSION_RULES_VERSION}  ",
         "",
         "## Catalog freeze",
@@ -536,10 +533,13 @@ def write_dataset_card(
         f"- Stats: {', '.join(f'`{c}`' for c in COMP_STAT_COLS)}.",
         "- Derived from `formula_pretty` via pymatgen Composition (no matminer).",
         "",
-        "## Split recipe (Step 4.2)",
+        "## Split recipe",
         "",
         f"- Seed: `{SPLIT_SEED}`",
-        f"- Fractions: train {TRAIN_FRAC:.0%} / val {VAL_FRAC:.0%} / test {1 - TRAIN_FRAC - VAL_FRAC:.0%}",
+        (
+            f"- Fractions: train {TRAIN_FRAC:.0%} / val {VAL_FRAC:.0%} / "
+            f"test {1 - TRAIN_FRAC - VAL_FRAC:.0%}"
+        ),
         "- Leak safety: materials sharing a structure fingerprint "
         "(composition + SG + nsites) share one `group_id` and one split.",
         "- Stratification bins: `nelements` (1/2/3/4+) × primary `source` × chemsys family.",
@@ -550,7 +550,7 @@ def write_dataset_card(
         "|-------|--:|",
         *[f"| {k} | {v:,} |" for k, v in sorted(split_counts.items())],
         "",
-        "## Per-target exports (Step 4.1)",
+        "## Per-target exports",
         "",
         "| Target | Tier | Rows | Excl. conflict | Train | Val | Test |",
         "|--------|------|-----:|---------------:|------:|----:|-----:|",
@@ -564,7 +564,7 @@ def write_dataset_card(
         )
     lines += [
         "",
-        "## Specialty hold-outs (Step 4.3)",
+        "## Specialty hold-outs",
         "",
         "| Hold-out | N |",
         "|----------|--:|",
@@ -656,7 +656,7 @@ def main() -> int:
 
     manifest = {
         "export_version": EXPORT_VERSION,
-        "generated_at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "generated_at_utc": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "exclusion_rules": export_rule_metadata(),
         "composition_features": {
             "n_frac_cols": len(FRAC_COLS),

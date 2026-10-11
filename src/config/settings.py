@@ -56,6 +56,7 @@ class Settings:
     mp_structure_batch_size: int = 200
     duckdb_read_only: bool = False
     database_config: dict[str, Any] = field(default_factory=dict)
+    models_config: dict[str, Any] = field(default_factory=dict)
 
     def raw_source_dir(self, source: str) -> Path:
         return self.raw_dir / source
@@ -93,6 +94,7 @@ def get_settings() -> Settings:
     _load_env()
 
     database_config = _load_yaml(PROJECT_ROOT / "configs" / "database.yaml")
+    models_config = _load_yaml(PROJECT_ROOT / "configs" / "models.yaml")
     mp_cfg = database_config.get("materials_project", {})
     duckdb_cfg = database_config.get("duckdb", {})
 
@@ -110,6 +112,7 @@ def get_settings() -> Settings:
         / duckdb_cfg.get("path", "data/processed/materials.duckdb"),
         duckdb_read_only=bool(duckdb_cfg.get("read_only", False)),
         database_config=database_config,
+        models_config=models_config,
     )
 
 
